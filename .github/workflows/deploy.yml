@@ -10,21 +10,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
+    - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Set up SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H 13.232.107.116 >> ~/.ssh/known_hosts
-
     - name: Deploy to EC2
-      run: |
-        ssh ec2-user@13.232.107.116 << 'EOF'
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          echo "Pulling latest code..."
           cd /home/ec2-user/your-app-folder
           git pull origin main
+
+          echo "Installing dependencies..."
           npm install
-          pm2 restart all || pm2 start server.js
-        EOF
+
+          echo "Killing existing app (if any)..."
+          fuser -k 3000/tcp || true
+
+          echo "Starting app using node..."
+          nohup node server.js > app.log 2>&1 &
+
+          echo "App deployed and running!"
