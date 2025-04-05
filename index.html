@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Welcome to Team Dashboard</title>
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<div class="welcome-container">
+<h1 class="welcome-title">Welcome to Team Dashboard</h1>
+<p class="welcome-subtitle">Access your team analysis and manage your files in one place</p>
+<div class="nav-cards-container">
+<a href="analysis-dashboard.html" class="nav-card">
+<div class="card-icon">📊</div>
+<h2 class="card-title">View Analysis</h2>
+<p class="card-description">Access detailed team performance metrics, charts, and status updates</p>
+</a>
+<a href="my-files.html" class="nav-card">
+<div class="card-icon">📁</div>
+<h2 class="card-title">My Files</h2>
+<p class="card-description">Manage your uploaded files, templates, and documentation</p>
+</a>
+<a href="central-team-view.html" class="nav-card">
+<div class="card-icon">👥</div>
+<h2 class="card-title">Central Team View</h2>
+<p class="card-description">View daily site status across all teams and milestones</p>
+</a>
+</div>
+</div>
+<script src="js/common.js"></script>
+<script>
+
+    document.querySelectorAll('.nav-card').forEach(card => {
+
+      card.addEventListener('click', (e) => {
+
+        e.preventDefault();
+
+        window.location.href = card.getAttribute('href');
+
+      });
+
+    });
+</script>
+</body>
+</html>
