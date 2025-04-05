@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Team Analysis Dashboard</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="instruction-box">
+<h2>Team Analysis Dashboard</h2>
+<p>1. Select your team from the dropdown</p>
+<p>2. Download and fill the template following your team's status nomenclature:</p>
+<ul>
+<li>Installation: "Installation Work in Progress", "Installation Done", "Installation Not Done"</li>
+<li>Integration: "Integration Work in Progress", "Integration Done", "Integration Not Done"</li>
+<li>RFAI Survey: "RFAI Survey in Progress", "RFAI Survey Done", "RFAI Survey Not Done"</li>
+<li>MO Punching: "MO Punching Work in Progress", "MO Punching Done", "MO Punching Not Done"</li>
+</ul>
+<p>3. Upload your filled template with the correct team password to view analysis</p>
+</div>
+<div class="button-container">
+<select id="teamSelect">
+<option value="">Select Team</option>
+<option value="installation">Installation Team</option>
+<option value="integration">Integration Team</option>
+<option value="rfaiSurvey">RFAI Survey Team</option>
+<option value="moPunching">MO Punching Team</option>
+<option value="pobo">POBO Team</option>
+<option value="materialDelivery">Material Delivery Team</option>
+<option value="pri">PRI Team</option>
+</select>
+<select id="circleSelect">
+<option value="">All Circles</option>
+<option value="Delhi">Delhi</option>
+<option value="Nepal">Nepal</option>
+<option value="AP">AP</option>
+<option value="Assam">Assam</option>
+<option value="Chennai">Chennai</option>
+<option value="Haryana">Haryana</option>
+<option value="HP">HP</option>
+<option value="ROTN">ROTN</option>
+<option value="UPW">UPW</option>
+<option value="J&K">J&K</option>
+<option value="Raj">Raj</option>
+<option value="Karnatka">Karnatka</option>
+</select>
+</div>
+<button onclick="downloadTeamTemplate()">Download Template</button>
+<input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" />
+<button onclick="document.getElementById('fileInput').click()">Upload File</button>
+<div id="passwordModal" class="modal">
+<div class="modal-content">
+<h3>Enter Team Password</h3>
+<input type="password" id="passwordInput" />
+<button onclick="validatePassword()">Submit</button>
+</div>
+</div>
+<div id="toast" class="toast"></div>
+<div id="analysisResults"></div>
+<div id="table-container"></div>
+<div id="pendingTasksContainer"></div>
+<script src="js/common.js"></script>
+<script src="js/analysis.js"></script>
+<script>
+    // Expose teamConfigs globally for the analysis.js code (if needed)
+    window.teamConfigs = {
+      installation: { password: 'install123', validStatuses: ['Partially Complete', 'Installation Done', 'Installation Not Done', 'Complete with Issue'], validRemarks: ['Material Shortage', 'Infra Issue', 'Access/owner/Community Issue', 'Power Issue', 'Mount Issue', 'Environmental Issue(Nest, Hive, Water logging vegitation etc)', 'Hold by Bharti', 'Jumper Mismatch', 'H/W Faulty', 'GSM Issue', 'WIP', 'To Start', 'MCB Issue', 'Water Logging Issue', 'Theft Issue', 'RMO / SRN', 'Planning Change', 'Access Approval Awaited', 'Weekend Access Only', 'Additional material required', 'Completed with Alarm', 'Media Issue', 'Team not Available', 'ASP drop'] },
+      integration: { password: 'integrate123', validStatuses: ['Integration Done with Alarm', 'Integration Done', 'Integration Not Done'], validRemarks: ['Media Issue', 'HW Faulty', 'Script NA', 'Fme NA', 'SACFA Pending', 'Power issue', 'LAC Issue', 'Access/owner/Community Issue', 'WIP', 'Infra issue', 'Hold By Customer', 'RMO', 'LKF Pending', 'Media Pending', 'J2 pending', 'Integration Completed'] },
+      rfaiSurvey: { password: 'rfai123', validStatuses: ['RFAI Survey Done', 'Survey Fail-access', 'Survey Fail-infra', 'Survey Planned', 'Not Plannned-Team Consumed', 'Not Planned-High RFAI', 'Pending-Team Drop', 'Pending-Access Issue', 'Pending-Weekend access'], validRemarks: ['Environmental Issue(Nest, Hive, Water logging vegitation etc)', 'Access/owner/Community Issue', 'Pole Mount height diffrence Issue', 'Weekend Issue', 'Power Issue', 'Infra Issue', 'Survey To Plan', 'OK for MO', 'Pole Mount NA', 'Mcb issue', 'Mcb and Pole Mount NA', 'OHS Issue', 'HCT Tray Issue', 'OD Bed/Pole NA', 'Others', 'J2 pending', 'Boundary Wall', 'EB Issue', 'PoP not ready', 'LoS Issue', 'Battery Bank NA', 'Nominal Hold', 'RFAI Received', 'RFAI Accepted', 'RFAI Rejected', 'CF-RFAI Accepted'] },
+      moPunching: { password: 'mopunch123', validStatuses: ['Dispatch Done', 'MO Done', 'MO Not Done', 'Dispatch Hold'], validRemarks: ['Mo to Raise', 'On Hold stock issue', 'On Hold BOQ', 'Short Material', 'Cancelled IM', 'Cancelled WH', 'On Hold By customer', 'Planning issue', 'Others', 'Oracle Issue/WH closed', 'Hold by WH', 'Nominal Hold', 'Vehicle NA', 'To Dispatch', 'Material On Hold Prestaging', 'On Hold Vehicle Issue', 'On Hold WH Issue', 'On Hold By Bharti', 'On Hold Access Issue', 'In Transit', 'Access/owner/Community Issue', 'RMO', 'Material Incorrect Delivery', 'Partial material delivered', 'Material Delivered at wrong location', 'Vehicle breakdown'] },
+      pobo: { password: 'pobo123', validStatuses: ['RFAI Accepted for Survey', 'Planning input incorrect', 'Rfai Hold', 'Descope'], validRemarks: ['RFAI Accepted for Survey', 'Planning input incorrect', 'Rfai Hold', 'Descope'] },
+      materialDelivery: { password: 'material123', validStatuses: ['Material In Transit', 'Material Delivery Done', 'Material Returned'], validRemarks: ['In Transit', 'Access/owner/Community Issue', 'RMO', 'Material Incorrect Delivery', 'Partial material delivered', 'Material Delivered at wrong location', 'Vehicle breakdown', 'Material on site'] },
+      pri: { password: 'pri123', validStatuses: ['PRI Work in Progress', 'PRI Done', 'PRI Not Done', 'PRI Status Not Available'], validRemarks: ['Environmental Issue(Nest, Hive, Water logging vegitation etc)', 'Access/owner/Community Issue', 'Pole Mount height diffrence Issue', 'Weekend Issue', 'Power Issue', 'Infra Issue', 'Mcb issue', 'Mcb and Pole Mount NA', 'Pole Mount NA', 'HCT Tray Issue', 'OD Bed/Pole NA', 'Boundary Wall', 'EB Issue', 'On Hold', 'Access Issue', 'To be Survey', 'To be Mo Punch', 'To be Dispatch', 'To be Delivered', 'To be Install', 'To be integration'] }
+    };
+</script>
+</body>
+</html>
