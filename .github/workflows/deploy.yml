@@ -13,17 +13,24 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: SSH & Deploy to EC2
+    - name: Upload files to EC2
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: "."                      # everything in repo
+        target: "/home/ec2-user/smart_app"  # ✅ change to your app directory
+
+    - name: SSH & Start App
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: ${{ secrets.EC2_HOST }}       # ✅ Use public DNS
-        username: ${{ secrets.EC2_USER }}   # usually ec2-user
-        key: ${{ secrets.EC2_SSH_KEY }}     # PEM key stored as secret
-        port: 22
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          cd /home/ec2-user/your-app-folder
-          git pull origin main
+          cd /home/ec2-user/smart_app
           npm install
           fuser -k 3000/tcp || true
           nohup node server.js > app.log 2>&1 &
-          echo "✅ App deployed and started!"
+          echo "✅ App deployed and started"
